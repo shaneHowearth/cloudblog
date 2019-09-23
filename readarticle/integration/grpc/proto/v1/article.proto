@@ -1,0 +1,37 @@
+syntax = "proto3";
+package v1;
+
+
+message ArticleRequest{
+	string api = 1;
+	string title = 2;
+	string url_title = 3;
+	string author = 4;
+	int32 year = 5;
+	int32 month = 6;
+	int32 day = 7;
+	double hour = 8;
+}
+
+// Multiple Articles
+message ArticleList{
+	repeated Article articles =1;
+}
+
+message Article{
+	string api = 1;
+	string title = 2;
+	string url_title = 3;
+	string author = 4;
+	int32 year = 5;
+	int32 month = 6;
+	int32 day = 7;
+	int32 hour = 8;
+	int32 minute = 9;
+}
+
+// Service to manage Article tasks
+service ArticleService {
+	// Get Articles
+	rpc GetArticles(ArticleRequest) returns (ArticleList){}
+}
