@@ -30,8 +30,13 @@ message Article{
 	int32 minute = 9;
 }
 
+message ArticleOffset{
+	string api = 1;
+	int32 offset = 2;
+}
+
 // Service to manage Article tasks
 service ArticleService {
-	// Get Articles
-	rpc GetArticles(ArticleRequest) returns (ArticleList){}
+	rpc GetArticle(ArticleRequest) returns (Article){}
+	rpc GetArticles(ArticleOffset) returns (ArticleList){}
 }
