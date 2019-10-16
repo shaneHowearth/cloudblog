@@ -10,24 +10,22 @@ import (
 	v1 "github.com/shanehowearth/cloudblog/readarticle/integration/grpc/gen/v1"
 )
 
-type Redis struct{}
-
 // GetByTitle -
 func (r *Redis) GetByTitle(title string) *v1.Article {
 	// get conn and put back when exit from method
 	var conn redis.Conn
-	if pool == nil {
-		initPool()
-		conn = pool.Get()
-		ping(conn)
+	if r.Pool == nil {
+		r.initPool()
+		conn = r.Pool.Get()
+		r.ping(conn)
 	}
 	if conn == nil {
-		conn = pool.Get()
+		conn = r.Pool.Get()
 	}
 	defer conn.Close()
 	id, err := redis.String(conn.Do("HGET", "articles:lookup:title", title))
 	if err != nil {
-		log.Printf("ERROR: fail get id for title %s, error %s", title, err.Error())
+		log.Printf("ERROR: failed get id for title %s, error %s", title, err.Error())
 		return &v1.Article{}
 	}
 	return r.GetByID(id)
@@ -37,19 +35,19 @@ func (r *Redis) GetByTitle(title string) *v1.Article {
 func (r *Redis) GetByID(id string) *v1.Article {
 	// get conn and put back when exit from method
 	var conn redis.Conn
-	if pool == nil {
-		initPool()
-		conn = pool.Get()
-		ping(conn)
+	if r.Pool == nil {
+		r.initPool()
+		conn = r.Pool.Get()
+		r.ping(conn)
 	}
 	if conn == nil {
-		conn = pool.Get()
+		conn = r.Pool.Get()
 	}
 	defer conn.Close()
 
 	dataset, err := redis.Values(conn.Do("HGETALL", id))
 	if err != nil {
-		log.Printf("ERROR: fail get key %s, error %s", id, err.Error())
+		log.Printf("ERROR: failed get key %s, error %s", id, err.Error())
 		return &v1.Article{}
 	}
 	// Put dataset into an Article
@@ -96,19 +94,19 @@ func (r *Redis) GetByID(id string) *v1.Article {
 func (r *Redis) GetFifty(offset, maxRetrieve int32) *v1.ArticleList {
 	// get conn and put back when exit from method
 	var conn redis.Conn
-	if pool == nil {
-		initPool()
-		conn = pool.Get()
-		ping(conn)
+	if r.Pool == nil {
+		r.initPool()
+		conn = r.Pool.Get()
+		r.ping(conn)
 	}
 	if conn == nil {
-		conn = pool.Get()
+		conn = r.Pool.Get()
 	}
 	defer conn.Close()
 
 	keys, err := redis.Strings(conn.Do("LRANGE", "article_keys", offset, offset+maxRetrieve))
 	if err != nil {
-		log.Printf("ERROR: fail get smembers with error: %s", err.Error())
+		log.Printf("ERROR: failed get smembers with error: %s", err.Error())
 		return &v1.ArticleList{Articles: []*v1.Article{}}
 	}
 
